@@ -1,30 +1,30 @@
 from manim import *
 from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.gtts import GTTSService
+from manim_voiceover.services.azure import AzureService
 
 
-class Scene1(VoiceoverScene):
-    def construct(self):
-        self.set_speech_service(GTTSService(lang="en", tld="com"))
-
-
+class Scene(VoiceoverScene):
+    def construct_scene1(self):
         with self.voiceover(text="Let's start with a story, inspired by some real experience I had.") as tracker:
             pass
 
-        game_window = Square()
+        game_scale = 0.5
+
+        game_window = ImageMobject("game.png").scale(game_scale)
 
         with self.voiceover(text="One day, I found a cool video game someone made.") as tracker:
-            self.play(Create(game_window))
+            self.play(FadeIn(game_window))
 
         with self.voiceover(text="I enjoyed it at first, but after a while, the game felt incomplete, and I wanted to add something new to it.") as tracker:
             pass
 
         with self.voiceover(text=" Thankfully, the game is open sourced, meaning I can download its source code, and recompile it with my modification.") as tracker:
             self.play(game_window.animate.shift(DOWN * 2))
-            source_file = Square()
+            source_file = ImageMobject("code.png").scale(game_scale)
             source_file.shift(UP)
             source_link = Line(source_file.get_bottom(), game_window.get_top())
-            self.play(Create(source_file), Create(source_link))
+            self.play(FadeIn(source_file), Create(source_link))
 
         with self.voiceover(text="I immediately grabbed the source code, made a tiny change to improve it, and I was really happy about it.") as tracker:
             day_zero_group = Group(source_file, source_link, game_window)
@@ -32,29 +32,29 @@ class Scene1(VoiceoverScene):
             self.add(day_zero_group)
             self.play(day_zero_group.animate.shift(LEFT * 3))
 
-            source_file1 = Square()
+            source_file1 = ImageMobject("code2.png").scale(game_scale)
             source_file1.shift(UP)
             change_link1 = Line(source_file.get_right(), source_file1.get_left())
-            self.play(Create(source_file1), Create(change_link1))
+            self.play(FadeIn(source_file1), Create(change_link1))
 
-            game_window1 = Square()
+            game_window1 = ImageMobject("game2.png").scale(game_scale)
             game_window1.shift(DOWN * 2)
             source_link1 = Line(source_file1.get_bottom(), game_window1.get_top())
-            self.play(Create(source_link1), Create(game_window1))
+            self.play(Create(source_link1), FadeIn(game_window1))
 
         with self.voiceover(text="The next day, I came up with another little idea, and again made a change to the game.") as tracker:
-            source_file2 = Square()
+            source_file2 = ImageMobject("code3.png").scale(game_scale)
             source_file2.shift(UP + RIGHT * 3)
             change_link2 = Line(source_file1.get_right(), source_file2.get_left())
-            self.play(Create(source_file2), Create(change_link2))
+            self.play(FadeIn(source_file2), Create(change_link2))
 
-            game_window2 = Square()
+            game_window2 = ImageMobject("game3.png").scale(game_scale)
             game_window2.shift(DOWN * 2 + RIGHT * 3)
             source_link2 = Line(source_file2.get_bottom(), game_window2.get_top())
-            self.play(Create(source_link2), Create(game_window2))
+            self.play(Create(source_link2), FadeIn(game_window2))
 
         scale_factor = 0.4
-        with self.voiceover(text="I continued doing this every day, for a hundred days, and accumulated one hundred little changes to the source code.") as tracker:
+        with self.voiceover(text="I continued doing this every day, and accumulated a hundred little changes to the source code.") as tracker:
             self.remove(day_zero_group,
                         source_file1, change_link1, source_link1, game_window1,
                         source_file2, change_link2, source_link2, game_window2)
@@ -64,68 +64,61 @@ class Scene1(VoiceoverScene):
             self.add(day_012_group)
             self.play(day_012_group.animate.scale(scale_factor).shift(LEFT * 3))
 
-            source_file3 = Square()
+            source_file3 = ImageMobject("code4.png").scale(game_scale)
             source_file3.scale(scale_factor)
             source_file3.move_to(source_file2.get_center() + RIGHT * scale_factor * 3)
 
-            game_window3 = Square()
+            game_window3 = ImageMobject("game4.png").scale(game_scale)
             game_window3.scale(scale_factor)
             game_window3.move_to(source_file3.get_center() + DOWN * scale_factor * 3)
 
             source_link3 = Line(source_file3.get_bottom(), game_window3.get_top())
             change_link3 = Line(source_file2.get_right(), source_file3.get_left())
 
-            self.play(Create(source_file3), Create(game_window3), Create(source_link3), Create(change_link3))
+            self.play(FadeIn(source_file3), FadeIn(game_window3), Create(source_link3), Create(change_link3))
 
-            source_file4 = Square()
+            source_file4 = ImageMobject("code5.png").scale(game_scale)
             source_file4.scale(scale_factor)
             source_file4.move_to(source_file3.get_center() + RIGHT * scale_factor * 3)
 
-            game_window4 = Square()
+            game_window4 = ImageMobject("game5.png").scale(game_scale)
             game_window4.scale(scale_factor)
             game_window4.move_to(source_file4.get_center() + DOWN * scale_factor * 3)
 
             source_link4 = Line(source_file4.get_bottom(), game_window4.get_top())
             change_link4 = Line(source_file3.get_right(), source_file4.get_left())
 
-            self.play(Create(source_file4), Create(game_window4), Create(source_link4), Create(change_link4))
+            self.play(FadeIn(source_file4), FadeIn(game_window4), Create(source_link4), Create(change_link4))
 
             source_file5 = Text("…", width = 2)
             source_file5.scale(scale_factor)
             source_file5.move_to(source_file4.get_center() + RIGHT * scale_factor * 3)
             change_link5 = Line(source_file4.get_right(), source_file5.get_left() + LEFT * 0.2)
 
-            self.play(Create(source_file5), Create(change_link5))
+            self.play(FadeIn(source_file5), Create(change_link5))
 
-            source_file6 = Square()
+            source_file6 = ImageMobject("code6.png").scale(game_scale)
             source_file6.scale(scale_factor)
             source_file6.move_to(source_file5.get_center() + RIGHT * scale_factor * 3)
 
-            game_window6 = Square()
+            game_window6 = ImageMobject("game6.png").scale(game_scale)
             game_window6.scale(scale_factor)
             game_window6.move_to(source_file6.get_center() + DOWN * scale_factor * 3)
 
             source_link6 = Line(source_file6.get_bottom(), game_window6.get_top())
             change_link6 = Line(source_file5.get_right() + RIGHT * 0.2, source_file6.get_left())
 
-            self.play(Create(source_file6), Create(game_window6), Create(source_link6), Create(change_link6))
+            self.play(FadeIn(source_file6), FadeIn(game_window6), Create(source_link6), Create(change_link6))
 
-        with self.voiceover(text="Then, someone told me that the game had an easter egg that I never discovered.") as tracker:
-            pass
-
-        with self.voiceover(text="I guess I shouldn't be too surprised, as I didn't really explore every corner in the game, nor in the source code.") as tracker:
-            pass
-
-        with self.voiceover(text="So I followed a guide to find the easter egg"):
-            pass
-
-        with self.voiceover(text="only to find that, for some reason, the game crashed."):
+        with self.voiceover(text="Then one day, I found an old cutscene now crashes the game.") as tracker:
             error = SVGMobject("icon-error.svg", stroke_color=RED, stroke_width = 8)
             error.scale(scale_factor * 0.8).move_to(game_window6.get_center())
             self.play(Create(error))
 
-        with self.voiceover(text="What's made it worse is that it caused a blue screen of death to my computer due to some graphic driver shenanigans."):
-            pass
+        with self.voiceover(text="What's worse is that it caused a blue screen of death to my computer due to some graphic driver shenanigans."):
+            bsod = ImageMobject("bsod.jpg").move_to(game_window6.get_center()).scale(0.3)
+            self.play(FadeTransform(game_window6, bsod), run_time = 0.3)
+            self.play(Wiggle(bsod))
 
         with self.voiceover(text="I quickly confirmed that the vanilla game did not crash"):
             correct = Text("✓", color=GREEN)
@@ -146,12 +139,12 @@ class Scene1(VoiceoverScene):
             self.play(Create(question1), Create(question2), Create(question3),
                       Create(question4), Create(question6))
 
-        self.wait()
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
 
-
-class Scene2(VoiceoverScene):
-    def construct(self):
-        self.set_speech_service(GTTSService(lang="en", tld="com"))
+    def construct_scene2(self):
 
         N = 20
 
@@ -186,11 +179,11 @@ class Scene2(VoiceoverScene):
             bug_arrow = Arrow(bug_icon.get_top(), commits[bug].get_bottom())
             self.play(Create(bug_icon), Create(bug_arrow), Indicate(commits[bug]), Indicate(markers[bug]))
 
-        with self.voiceover(text="There is a tool in git, called git bisect, which allows you quickly find the bad commit."):
+        with self.voiceover(text="There is a tool in git, called git bisect, which one can use to quickly find the bad commit."):
             pass
 
-        with self.voiceover(text="If you are not familiar with git, your first reaction might be, just test all versions from the beginning one by one, and you will hit the bad change at some point."):
-            self.play(*[FadeOut(marker) for marker in markers[1:-1]])
+        with self.voiceover(text="For someone not familiar with git, they might test all versions from the beginning one by one, until they hit the bad change."):
+            self.play(*[FadeOut(marker) for marker in markers[1:-1]], FadeOut(git_logo))
             self.play(FadeOut(bug_icon), FadeOut(bug_arrow))
 
             magni = SVGMobject("magnifying.svg", stroke_color=WHITE, stroke_width=2).scale(0.2).move_to(commits[1].get_top() + UP * 1)
@@ -206,13 +199,13 @@ class Scene2(VoiceoverScene):
             self.play(FadeIn(bug_icon), FadeIn(bug_arrow), play_time=0.1)
             self.play(Flash(bug_icon))
 
-        with self.voiceover(text="But if you think a little bit, and recall the algorithm called binary search, you will come up with a better strategy"):
+        with self.voiceover(text="But if we recall the binary search algorithm, we can come up with a better strategy"):
             self.play(*[FadeOut(marker) for marker in markers[1:bug + 1]])
             self.play(FadeOut(bug_icon), FadeOut(bug_arrow), FadeOut(magni_arrow), FadeOut(magni))
 
         tested_markers = []
         tester = N // 2
-        with self.voiceover(text="we first test the change made in the middle"):
+        with self.voiceover(text="We first test the change made in the middle"):
             magni_arrow = Arrow(commits[tester].get_top() + UP, commits[tester].get_top())
             magni.move_to(commits[tester].get_top() + UP * 1)
             self.play(Create(magni), Create(magni_arrow))
@@ -268,7 +261,7 @@ class Scene2(VoiceoverScene):
                              commits[begin].get_center() + DOWN * range_rect_h,
                              commits[end].get_center() + DOWN * range_rect_h,
                              commits[end].get_center() + UP * range_rect_h).set_z_index(-1)
-        with self.voiceover(text="for the particular problem I have, the bug would crash my entire system, and it takes like 10 minutes to reboot and set everything up again. Meanwhile, if a version of the game doesn't crash, it takes only 1 minute to verify it works fine."):
+        with self.voiceover(text="for the particular problem I have, the bug would crash my entire system, and it takes 10 minutes to reboot and set everything up again. Meanwhile, if a version of the game doesn't crash, it takes only 1 minute to verify it works fine."):
             self.play(FadeIn(range_rect))
             magni_arrow = Arrow(commits[tester].get_top() + UP, commits[tester].get_top())
             magni.move_to(commits[tester].get_top() + UP * 1)
@@ -318,7 +311,7 @@ class Scene2(VoiceoverScene):
                              commits[begin].get_center() + DOWN * range_rect_h,
                              commits[end].get_center() + DOWN * range_rect_h,
                              commits[end].get_center() + UP * range_rect_h).set_z_index(-1)
-        with self.voiceover(text="Intuitively, the answer is no, and I'd like to do more tests that are likely successful, so I spend less time rebooting my computer. I want to test an earlier change somewhere off the center, because it is less likely that the bad change made it in early on."):
+        with self.voiceover(text="Intuitively, the answer is no, because I prefer spending less time rebooting my computer. I want to test earlier changes somewhere off the center, because it is less likely that the bad change made it in early on."):
             self.play(FadeIn(range_rect))
             magni_arrow = Arrow(commits[tester].get_top() + UP, commits[tester].get_top())
             magni.move_to(commits[tester].get_top() + UP * 1)
@@ -355,16 +348,16 @@ class Scene2(VoiceoverScene):
             self.play(FadeIn(bug_icon), FadeIn(bug_arrow), play_time=0.1)
             self.play(Flash(bug_icon))
 
-        with self.voiceover(text="Now the question to ask is: what my strategy should be to minimize my total time?"):
+        with self.voiceover(text="It is then natural to ask: what my strategy should be to minimize my total time?"):
             question = Text("What's the optimal strategy?").shift(DOWN * 2)
             self.play(Write(question))
 
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
 
-        self.wait()
-
-class Scene3(VoiceoverScene):
-    def construct(self):
-        self.set_speech_service(GTTSService(lang="en", tld="com"))
+    def construct_scene3(self):
 
         with self.voiceover(text="We want to minimize the total time, so let's see how to calculate it first."):
             pass
@@ -379,21 +372,30 @@ class Scene3(VoiceoverScene):
 
         with self.voiceover(text="n, the total number of changes made to the program"):
             self.play(Indicate(f_text2.get_part_by_tex("n")))
+            param_n = Tex("$n$ - number of total changes").shift(DOWN)
+            self.play(Write(param_n))
 
         with self.voiceover(text="s, the time taken by a successful test"):
             self.play(Indicate(f_text2.get_part_by_tex("s")))
+            param_s = Tex("$s$ - successful test time cost").move_to(param_n.get_bottom() + DOWN * 0.1, UP)
+            param_s.align_to(param_n, LEFT)
+            self.play(Write(param_s))
 
         with self.voiceover(text="and t, the time taken by a failed test"):
             self.play(Indicate(f_text2.get_part_by_tex("t")))
+            param_t = Tex("$t$ - failed test time cost").move_to(param_s.get_bottom() + DOWN * 0.1, UP)
+            param_t.align_to(param_n, LEFT)
+            self.play(Write(param_t))
 
         with self.voiceover(text="Here I'd like to use a notation where I put s and t as subscripts of F"):
             f_text3 = MathTex("{{F}}_{ {{s}},{{t}} }", "(", "n", ")")
             self.play(TransformMatchingTex(f_text2, f_text3))
 
-        with self.voiceover(text="This is just to signify they play a different role from the input n, but mathematically they are still inputs of the function F"):
+        with self.voiceover(text="This is just to signify they play a different role from the input n, but they are still inputs of the function F"):
             pass
 
         with self.voiceover(text="It's often a good idea to start with small cases. "):
+            self.play(FadeOut(param_s), FadeOut(param_t), FadeOut(param_n))
             self.play(f_text3.animate.shift(UP * 3))
 
         with self.voiceover(text="What is the value of F when n is one?"):
@@ -414,7 +416,7 @@ class Scene3(VoiceoverScene):
 
         desc_right = RIGHT * 1
 
-        with self.voiceover(text="Well, this is very easy, as n equal to one means I have made only one change to the code, "):
+        with self.voiceover(text="Well, this is very easy. It means I have made only one change to the code, "):
             self.play(f_n1.animate.shift(RIGHT * 3))
             commits.append(Circle(0.1, color=WHITE).shift(LEFT * 5 + UP))
             commits_desc.append(Tex("Original", font_size=36).move_to(commits[-1].get_right() + desc_right, LEFT))
@@ -464,9 +466,8 @@ class Scene3(VoiceoverScene):
                        bad.copy().move_to(commits[2])]
             self.play(Create(markers[0]), run_time=0.2)
             self.play(Create(markers[1]), run_time=0.2)
-            pass
 
-        with self.voiceover(text=" and I want to know which of them introduced the bug."):
+        with self.voiceover(text="and I want to know which of them introduced the bug."):
             bug_icon_left = LEFT
             bug_icon_question_left = LEFT * 0.5
             bug_icon.move_to(commits[1].get_left() + bug_icon_left, RIGHT)
@@ -480,17 +481,15 @@ class Scene3(VoiceoverScene):
                           bug_icon_question.animate.move_to(commits[current].get_left() + bug_icon_question_left, RIGHT),
                           play_time = 0.3)
 
-            pass
 
         with self.voiceover(text="Or perhaps both of them introduced some bugs?"):
             current = 3 - current
-            self.wait(2)
             bug_icon2 = bug_icon.copy()
             bug_icon_question2 = bug_icon_question.copy()
             self.play(bug_icon2.animate.move_to(commits[current].get_left() + bug_icon_left, RIGHT),
                       bug_icon_question2.animate.move_to(commits[current].get_left() + bug_icon_question_left, RIGHT),
                       play_time = 0.3)
-            pass
+            self.wait(2)
 
         with self.voiceover(text="OK, this can soon get out of hand, so let's clarify an assumption"):
             self.play(FadeOut(bug_icon), FadeOut(bug_icon_question),
@@ -536,7 +535,7 @@ class Scene3(VoiceoverScene):
             cost2 = MathTex(r"\mbox{cost} = ", "s").move_to(commits_b[2].get_center() + DOWN)
             self.play(FadeIn(cost2, shift=DOWN))
 
-        with self.voiceover(text='But you might say, wait, there should be no cost at all.'):
+        with self.voiceover(text='But some might say, wait, there should be no cost at all.'):
             pass
 
         with self.voiceover(text="since we immediately get the result from the testing, we don't need to wait for computer reboot or anything"):
@@ -579,7 +578,7 @@ class Scene3(VoiceoverScene):
             markers_b = [good.copy().move_to(commits_b[0]), bad.copy().move_to(commits_b[-1])]
             self.play(Create(markers[0]), Create(markers[1]), Create(markers_b[0]), Create(markers_b[1]), run_time=0.2)
 
-        with self.voiceover(text='Oh by the way, I should mention that my computer is not capable of running multiple tests in parallel, so I must perform tests sequentially'):
+        with self.voiceover(text='By the way, I should mention that my computer is not capable of running multiple tests in parallel, so I must perform tests sequentially'):
             pass
 
         w = 3
@@ -654,7 +653,7 @@ class Scene3(VoiceoverScene):
 
 
         with self.voiceover(text="Here the range for w is all n changes except for the last one, because we already know the last version is broken"):
-            self.play(Indicate(total_f.get_part_by_tex(r"1\le w<n")))
+            self.play(Indicate(total_f.get_part_by_tex(r"1\le w<\le n-1")))
 
         with self.voiceover(text="We also notice the n equal to 2 case can be merged with the general formula"):
             self.play(Indicate(f_n2_2))
@@ -686,3 +685,14 @@ class Scene3(VoiceoverScene):
 
         with self.voiceover(text="In the next section, we will study the properties of these functions, and see if the formula can be simplified."):
             pass
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
+
+    def construct(self):
+        self.set_speech_service(AzureService())
+        self.construct_scene1()
+        self.construct_scene2()
+        self.construct_scene3()
