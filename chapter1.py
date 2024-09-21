@@ -110,12 +110,12 @@ class Scene(VoiceoverScene):
 
             self.play(FadeIn(source_file6), FadeIn(game_window6), Create(source_link6), Create(change_link6))
 
-        with self.voiceover(text="Then one day, I found an old cutscene now crashes the game.") as tracker:
+        with self.voiceover(text="Then one day, I found an old cutscene started crashing the game.") as tracker:
             error = SVGMobject("icon-error.svg", stroke_color=RED, stroke_width = 8)
             error.scale(scale_factor * 0.8).move_to(game_window6.get_center())
             self.play(Create(error))
 
-        with self.voiceover(text="What's worse is that it caused a blue screen of death to my computer due to some graphic driver shenanigans."):
+        with self.voiceover(text="What's worse was that it caused a blue screen of death to my computer due to some graphic driver shenanigans."):
             bsod = ImageMobject("bsod.jpg").move_to(game_window6.get_center()).scale(0.3)
             self.play(FadeTransform(game_window6, bsod), run_time = 0.3)
             self.play(Wiggle(bsod))
@@ -125,7 +125,7 @@ class Scene(VoiceoverScene):
             correct.scale(scale_factor * 3).move_to(game_window.get_center())
             self.play(Create(correct))
 
-        with self.voiceover(text="so the culprit is one of the hundred changes I made"):
+        with self.voiceover(text="so the culprit was one of the hundred changes I made"):
             self.play(Indicate(source_file1), Indicate(source_file2), Indicate(source_file3),
                       Indicate(source_file4), Indicate(source_file5), Indicate(source_file6))
 
@@ -245,7 +245,7 @@ class Scene(VoiceoverScene):
             self.play(FadeIn(bug_icon), FadeIn(bug_arrow), play_time=0.1)
             self.play(Flash(bug_icon))
 
-        with self.voiceover(text="With binary search, the number of tests we need to perform is logarithmic to the number of total changes"):
+        with self.voiceover(text="With binary search, the number of tests we need to perform is logarithmic to the number of changes"):
             log_text = MathTex(r"\#(\mbox{test}) = \log(\#(\mbox{changes}))").shift(DOWN * 2)
             self.play(Write(log_text))
 
@@ -372,7 +372,7 @@ class Scene(VoiceoverScene):
 
         with self.voiceover(text="n, the total number of changes made to the program"):
             self.play(Indicate(f_text2.get_part_by_tex("n")))
-            param_n = Tex("$n$ - number of total changes").shift(DOWN)
+            param_n = Tex("$n$ - total number of changes").shift(DOWN)
             self.play(Write(param_n))
 
         with self.voiceover(text="s, the time taken by a successful test"):
@@ -481,22 +481,8 @@ class Scene(VoiceoverScene):
                           bug_icon_question.animate.move_to(commits[current].get_left() + bug_icon_question_left, RIGHT),
                           play_time = 0.3)
 
-
-        with self.voiceover(text="Or perhaps both of them introduced some bugs?"):
-            current = 3 - current
-            bug_icon2 = bug_icon.copy()
-            bug_icon_question2 = bug_icon_question.copy()
-            self.play(bug_icon2.animate.move_to(commits[current].get_left() + bug_icon_left, RIGHT),
-                      bug_icon_question2.animate.move_to(commits[current].get_left() + bug_icon_question_left, RIGHT),
-                      play_time = 0.3)
-            self.wait(2)
-
-        with self.voiceover(text="OK, this can soon get out of hand, so let's clarify an assumption"):
-            self.play(FadeOut(bug_icon), FadeOut(bug_icon_question),
-                      FadeOut(bug_icon2), FadeOut(bug_icon_question2))
-
-        with self.voiceover(text="there will always be exactly one bug introduced by one code change, and every changes I made are equally possible to be the culprit"):
-            pass
+        with self.voiceover(text="I should clarify that we always assume there is only one problematic change"):
+            self.play(FadeOut(bug_icon), FadeOut(bug_icon_question))
 
 
         commits_b = [x.copy() for x in commits]
@@ -510,6 +496,7 @@ class Scene(VoiceoverScene):
             markers.append(bad.copy().move_to(commits[1]))
             markers_b.append(good.copy().move_to(commits_b[1]))
             bug_icon.move_to(commits[1].get_left(), RIGHT)
+            bug_icon2 = bug_icon.copy()
             bug_icon2.move_to(commits_b[2].get_right(), LEFT)
             self.play(FadeIn(bug_icon), FadeIn(bug_icon2))
             self.play(Create(markers[2]), run_time=0.2)
@@ -653,7 +640,7 @@ class Scene(VoiceoverScene):
 
 
         with self.voiceover(text="Here the range for w is all n changes except for the last one, because we already know the last version is broken"):
-            self.play(Indicate(total_f.get_part_by_tex(r"1\le w<\le n-1")))
+            self.play(Indicate(total_f.get_part_by_tex(r"1\le w\le n-1")))
 
         with self.voiceover(text="We also notice the n equal to 2 case can be merged with the general formula"):
             self.play(Indicate(f_n2_2))
@@ -680,7 +667,7 @@ class Scene(VoiceoverScene):
                     Create(final_brace))
 
         with self.voiceover(text="And since our goal is to find the best strategy, let's also define a function w, which is the value w we choose when finding the minimal value in F"):
-            final_w = MathTex(r"w_{s,t}(n) = \{\mbox{The optimal $w$ in the $F_{s,t}(n)$ formula}\}").shift(DOWN)
+            final_w = MathTex(r"w_{s,t}(n) = \{\mbox{The optimal $w$ in $F_{s,t}(n)$}\}").shift(DOWN)
             self.play(Write(final_w))
 
         with self.voiceover(text="In the next section, we will study the properties of these functions, and see if the formula can be simplified."):
@@ -692,7 +679,9 @@ class Scene(VoiceoverScene):
         )
 
     def construct(self):
-        self.set_speech_service(AzureService())
+        #self.set_speech_service(AzureService())
+        self.set_speech_service(GTTSService())
         self.construct_scene1()
         self.construct_scene2()
         self.construct_scene3()
+
