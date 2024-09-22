@@ -261,11 +261,270 @@ class Scene(VoiceoverScene):
 
     def construct_scene2(self):
         s,t = 1,2
-        N = 80
+        N = 57
         e = get_series_at(E_SERIESES, ST(s, t))
 
-        axes = Axes(x_range=[0,N,1], y_range=[0, N / 2,1], x_length = 10, y_length = 5)
-        self.play(Create(axes))
+        with self.voiceover(text="This time, we fix s and t, and let n vary"):
+            axes = Axes(x_range=[0,N,5], y_range=[0, N / 2,5], x_length = 10, y_length = 5).shift(DOWN * 0.5)
+            axes_hori = MathTex("n").move_to(axes.get_corner(RIGHT+DOWN), LEFT).shift(RIGHT*0.2)
+            axes_vert = MathTex(f"w_{{ {s},{t} }}(n)").move_to(axes.get_corner(LEFT+UP), DOWN).shift(UP * 0.2)
+            self.play(Create(axes), Write(axes_hori), Write(axes_vert))
+
+        def plot_w_dot(axes, N, e):
+            plots = VGroup()
+            for n in range(2, N + 1):
+                for w in range(e.wmin[n], e.wmax[n] + 1):
+                    dot = Dot(axes.coords_to_point(n, w), color=BLUE, radius=0.04)
+                    plots.add(dot)
+            return plots
+
+        def plot_w_para(axes, N, e):
+            necks = [neck for neck in e.necks if neck < N]
+            para_plot = VGroup()
+            measures = VGroup()
+            measures_n = VGroup()
+            measures_w = VGroup()
+            n_sequence = [r"\mbox{span}_n = "]
+            w_sequence = [r"\mbox{height}_w = "]
+            for i in range(len(necks) - 1):
+                nl = necks[i]
+                nr = necks[i + 1]
+                wl = e.wmin[nl]
+                wr = e.wmax[nr]
+                a = axes.coords_to_point(nl, wl)
+                b = axes.coords_to_point(nr - (wr- wl), wl)
+                c = axes.coords_to_point(nr, wr)
+                d = axes.coords_to_point(nl + (wr- wl), wr)
+                para_plot.add(Polygon(a,b,c,d,fill_color=DARK_GREY,fill_opacity=1.0,color=GREY))
+
+                measure_stroke = 1.0
+                measure_dash = 0.04
+                if i == 0:
+                    measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(nl, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+                    measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(0, wl) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+                measures.add(DashedLine(axes.coords_to_point(nr, wr), axes.coords_to_point(nr, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+                measures.add(DashedLine(axes.coords_to_point(nl + (wr-wl), wr), axes.coords_to_point(0, wr) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+
+                n_span = str(nr-nl)
+                measures_n.add(MathTex(n_span).move_to((axes.coords_to_point(nl, 0) + axes.coords_to_point(nr, 0))/2 + DOWN * 0.2, UP).scale(0.6))
+
+                w_height = str(wr-wl)
+                shift = LEFT * 0.2
+                if wr-wl < 2:
+                    shift = LEFT * (0.6 + 0.3 *(i % 2))
+                measures_w.add(MathTex(w_height).move_to((axes.coords_to_point(0, wl) + axes.coords_to_point(0, wr))/2 + shift, RIGHT).scale(0.6))
+
+                n_sequence += [n_span, ","]
+                w_sequence += [w_height, ","]
+
+            n_sequence.append(r"\cdots")
+            w_sequence.append(r"\cdots")
+
+            return para_plot, measures, measures_n, measures_w, MathTex(*n_sequence), MathTex(*w_sequence)
+
+        with self.voiceover(text="We plot the function w versus n with s-t ratio of 1 to 2."):
+            plots = plot_w_dot(axes, N, e)
+            self.play(Create(plots), run_time = 4)
+
+        with self.voiceover(text="Because both n and w are integers, our plot is a collection of discrete points."):
+            pass
+
+        with self.voiceover(text="But we notice that they form a series of parallelograms."):
+            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = plot_w_para(axes, N, e)
+            self.play(Create(para_plot))
+
+        with self.voiceover(text="These parallelograms all have vertices of 45 degrees, and are connected with each other at those vertices."):
+            n_a = [neck for neck in e.necks if neck < N][-2]
+            w_a = e.wmin[n_a]
+            neck = axes.coords_to_point(n_a, w_a)
+            l1 = Line(neck + LEFT, neck + RIGHT, color = RED)
+            l2 = l1.copy().rotate(PI/4,about_point=neck)
+            angle = Angle(l1, l2, color=RED)
+            value = MathTex(r"45^{\circ}", color=RED).next_to(angle, DOWN)
+            self.play(Create(l1), Create(l2), Create(angle), Write(value))
+
+        with self.voiceover(text="Let's measure the span and the hight of these parallelograms"):
+            self.play(FadeOut(l1), FadeOut(l2), FadeOut(angle), FadeOut(value))
+            self.play(Create(measures), Create(measures_n), Create(measures_w))
+
+        with self.voiceover(text="and collect them together into two sequences."):
+            n_sequence.shift(UP * 3)
+            w_sequence.shift(UP * 2)
+            self.play(TransformMatchingTex(measures_n, n_sequence))
+            self.play(TransformMatchingTex(measures_w, w_sequence))
+
+        with self.voiceover(text="Hold on, this looks very familiar. Isn't this the Fibonacci sequence?"):
+            pass
+
+        with self.voiceover(text="In this sequence, each number is the sum of two previous numbers."):
+            rec = MathTex(r"a_{k} = a_{k-1} + a_{k-2}").shift(UP)
+            self.play(Write(rec))
+            numbers = [n_sequence.get_part_by_tex(str(n)) for n in [1,2,3,5,8,13,21]]
+            prev = None
+            for i in range(len(numbers) - 2):
+                summer = VGroup()
+                brace = Brace(VGroup(numbers[i], numbers[i + 1]), direction= UP, color=YELLOW)
+                lb = brace.get_top()
+                rb = numbers[i + 2].get_top() + UP * 0.2
+                lt = lb + UP * 0.1
+                rt = (rb[0], lt[1], 0)
+                arrow = VMobject(color=YELLOW).set_points_as_corners([
+                    lb, lt, rt, rb
+                ])
+                tip = VMobject(color=YELLOW).set_points_as_corners([
+                    rb + (-0.1, 0.1, 0.0), rb, rb + (0.1, 0.1, 0.0)
+                ])
+                #arrow.add_tip()
+                summer.add(brace)
+                summer.add(arrow)
+                summer.add(tip)
+                if prev is None:
+                    self.play(FadeIn(summer), run_time = 0.1)
+                else:
+                    self.play(FadeOut(prev), FadeIn(summer), run_time = 0.1)
+                prev = summer
+                self.wait(0.5)
+            pass
+
+        with self.voiceover(text="Could this be a coincidence?"):
+            self.play(FadeOut(prev))
+
+        with self.voiceover(text="Let's try a different configuration of s and t and see if it has similar patterns"):
+            self.play(FadeOut(rec), FadeOut(w_sequence), FadeOut(n_sequence), FadeOut(para_plot), FadeOut(measures))
+
+        with self.voiceover(text="Let's try 2 to 3 as the s-t ratio"):
+            s,t = 2,3
+            e = get_series_at(E_SERIESES, ST(s, t))
+            axes_vert_2 = MathTex(f"w_{{ {s} , {t} }}(n)").move_to(axes_vert.get_center())
+            self.play(TransformMatchingTex(axes_vert, axes_vert_2, transform_mismatches=True))
+            old_plots = plots
+            plots = plot_w_dot(axes, N, e)
+            self.play(Transform(old_plots, plots))
+
+        with self.voiceover(text="Similarly, we recognize the series of parallelograms"):
+            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = plot_w_para(axes, N, e)
+            self.play(Create(para_plot))
+
+        with self.voiceover(text="Again, we measure the span and the height of these parallelograms"):
+            self.play(Create(measures), Create(measures_n), Create(measures_w))
+
+        with self.voiceover(text="and collect them into sequences"):
+            n_sequence.shift(UP * 3)
+            w_sequence.shift(UP * 2)
+            self.play(TransformMatchingTex(measures_n, n_sequence))
+            self.play(TransformMatchingTex(measures_w, w_sequence))
+
+        with self.voiceover(text="This time, it is less obvious what the sequence is. But if we look carefully"):
+            pass
+
+        with self.voiceover(text="We'll notice that each number is still the sum of two other numbers"):
+            pass
+
+        with self.voiceover(text="But now they are two or three slots a part."):
+            rec = MathTex(r"a_{k} = a_{k-2 } + a_{k- 3 }").shift(UP)
+            self.play(Write(rec))
+            numbers = n_sequence.submobjects
+            numbers = [numbers[i] for i in range(len(numbers) - 1) if i % 2 == 1] # HACK
+            prev = None
+            for i in range(len(numbers) - 3):
+                summer = VGroup()
+                brace = Brace(VGroup(numbers[i], numbers[i + 1]), direction= UP, color=YELLOW)
+                lb = brace.get_top()
+                rb = numbers[i + 3].get_top() + UP * 0.2
+                lt = lb + UP * 0.1
+                rt = (rb[0], lt[1], 0)
+                arrow = VMobject(color=YELLOW).set_points_as_corners([
+                    lb, lt, rt, rb
+                ])
+                tip = VMobject(color=YELLOW).set_points_as_corners([
+                    rb + (-0.1, 0.1, 0.0), rb, rb + (0.1, 0.1, 0.0)
+                ])
+                summer.add(brace)
+                summer.add(arrow)
+                summer.add(tip)
+                if prev is None:
+                    self.play(FadeIn(summer), run_time = 0.1)
+                else:
+                    self.play(FadeOut(prev), FadeIn(summer), run_time = 0.1)
+                prev = summer
+                self.wait(0.5)
+            self.play(FadeOut(prev))
+
+        with self.voiceover("We also notice how the number 2 and 3 likely come from the value of s and t"):
+            self.play(Transform(axes_vert_2.copy(), rec))
+            pass
+
+        with self.voiceover("This hints how different s t configuration affects the strategy w."):
+            pass
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
+
+        pass
+
+    def construct_scene3(self):
+        with self.voiceover("Based on our observation so far, we can formulate our conjecture about the optimal strategy"):
+            pass
+
+        with self.voiceover("The function w is segmented by some nodes n1, n2, n3, and so on"):
+            n1 = MathTex("w_{s,t}(n_1) = ").shift(UP * 3 + LEFT)
+            n2 = MathTex("w_{s,t}(n_2) = ").shift(UP * 2 + LEFT)
+            n3 = MathTex("w_{s,t}(n_3) = ").shift(UP + LEFT)
+            n4 = MathTex(r"\cdots")
+            self.play(Write(n1))
+            self.play(Write(n2))
+            self.play(Write(n3))
+            self.play(Write(n4))
+
+        with self.voiceover("Right at each node, the optimal strategy is a single value w1, w2, w3 and so on."):
+            w1 = MathTex(r"\{w_1\}").move_to(n1.get_right() + RIGHT * 0.3, LEFT)
+            w2 = MathTex(r"\{w_2\}").move_to(n2.get_right() + RIGHT * 0.3, LEFT)
+            w3 = MathTex(r"\{w_3\}").move_to(n3.get_right() + RIGHT * 0.3, LEFT)
+            self.play(Write(w1))
+            self.play(Write(w2))
+            self.play(Write(w3))
+
+        with self.voiceover("In each segment between two nodes, a parallelogram forms"):
+            wn1 = Tex(r"For $n_i \le n \le n_j$").shift(DOWN)
+            wn2 = MathTex(r"w_{s,t}(n) = \{w\in\mathbb{Z} \mid w_i\le w \le w_i + (n-n_i) \land w_j -(n_j - n)\le w\le w_j \}").shift(DOWN * 2).scale(0.8)
+            self.play(Write(wn1))
+            self.play(Write(wn2))
+
+        with self.voiceover("And lastly, the length and the height of segments form sequences that satisfies a recurrence relation that generalizes Fibonacci sequence"):
+            self.play(FadeOut(wn1), FadeOut(wn2))
+            a1 = MathTex(r"a_j = n_{j+1} - n_j").shift(DOWN + LEFT * 3)
+            b1 = MathTex(r"b_j = w_{j+1} - w_j").shift(DOWN + RIGHT * 3)
+            self.play(Write(a1), Write(b1))
+            a2 = MathTex(r"a_j = {{a_{j - s} }} + {{a_{j - t} }}").shift(DOWN * 2 + LEFT * 3)
+            b2 = MathTex(r"b_j = {{b_{j - s} }} + {{b_{j - t} }}").shift(DOWN * 2 + RIGHT * 3)
+            self.play(Write(a2), Write(b2))
+
+        with self.voiceover("But this formula only makes sense for integer s and t"):
+            st_int = MathTex(r"{{s, t}}\in\mathbb{Z}", color = YELLOW).shift(DOWN*3)
+            self.play(Write(st_int))
+
+        with self.voiceover("We can relax this a bit because we are free to scale s and t by a common factor"):
+            st_int2 = MathTex(r"{{ks, kt}}\in\mathbb{Z}", color = YELLOW).shift(DOWN*3)
+            self.play(Transform(st_int, st_int2))
+            a3 = MathTex(r"a_j = {{a_{j - ks} }} + {{a_{j - kt} }}").shift(DOWN * 2 + LEFT * 3)
+            b3 = MathTex(r"b_j = {{b_{j - ks} }} + {{b_{j - kt} }}").shift(DOWN * 2 + RIGHT * 3)
+            self.play(Transform(a2, a3), Transform(b2, b3))
+
+        with self.voiceover("And this works out as long as s over t is rational"):
+            st_int3 = MathTex(r"s/t\in\mathbb{Q}", color = YELLOW).shift(DOWN*3)
+            self.play(Transform(st_int, st_int3))
+
+        with self.voiceover("So what happens if we are given irratonal s and t?"):
+            pass
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
+
+
 
 
 
@@ -274,4 +533,6 @@ class Scene(VoiceoverScene):
         #self.set_speech_service(AzureService())
         self.set_speech_service(GTTSService())
         #self.construct_scene1()
-        self.construct_scene2()
+        #self.construct_scene2()
+        self.construct_scene3()
+
