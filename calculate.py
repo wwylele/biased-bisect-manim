@@ -1,6 +1,7 @@
 
 from typing import NamedTuple, List
-
+import sys
+sys.setrecursionlimit(10000)
 
 MAX_N = 100
 

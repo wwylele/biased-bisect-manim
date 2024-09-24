@@ -4,9 +4,10 @@ from manim_voiceover.services.gtts import GTTSService
 from manim_voiceover.services.azure import AzureService
 
 from calculate import *
+import math
 
 
-E_SERIESES = g_generate(100)
+E_SERIESES = g_generate(1000)
 
 class Scene(VoiceoverScene):
     def construct_scene1(self):
@@ -211,7 +212,7 @@ class Scene(VoiceoverScene):
             self.play(Create(w_range_slash))
             pass
 
-        with self.voiceover(text="To make this precise, we should define w as a function that outputs not a single value, but a set of values"):
+        with self.voiceover(text="To make this precise, we should define w as a function that outputs not a single number, but a set of natural numbers"):
             w_range_new = MathTex("w_{s,t}(n)", r"\subseteq\mathbb{N}").move_to(w_range.get_center())
             self.play(FadeOut(w_range_slash), TransformMatchingTex(w_range, w_range_new))
 
@@ -259,6 +260,58 @@ class Scene(VoiceoverScene):
 
         pass
 
+    def plot_w_dot(self, axes, N, e):
+        plots = VGroup()
+        for n in range(2, N + 1):
+            for w in range(e.wmin[n], e.wmax[n] + 1):
+                dot = Dot(axes.coords_to_point(n, w), color=BLUE, radius=0.04)
+                plots.add(dot)
+        return plots
+
+    def plot_w_para(self, axes, N, e):
+        necks = [neck for neck in e.necks if neck < N]
+        para_plot = VGroup()
+        measures = VGroup()
+        measures_n = VGroup()
+        measures_w = VGroup()
+        n_sequence = [r"\mbox{span}_n = "]
+        w_sequence = [r"\mbox{height}_w = "]
+        for i in range(len(necks) - 1):
+            nl = necks[i]
+            nr = necks[i + 1]
+            wl = e.wmin[nl]
+            wr = e.wmax[nr]
+            a = axes.coords_to_point(nl, wl)
+            b = axes.coords_to_point(nr - (wr- wl), wl)
+            c = axes.coords_to_point(nr, wr)
+            d = axes.coords_to_point(nl + (wr- wl), wr)
+            para_plot.add(Polygon(a,b,c,d,fill_color=DARK_GREY,fill_opacity=1.0,color=GREY))
+
+            measure_stroke = 1.0
+            measure_dash = 0.04
+            if i == 0:
+                measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(nl, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+                measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(0, wl) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+            measures.add(DashedLine(axes.coords_to_point(nr, wr), axes.coords_to_point(nr, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+            measures.add(DashedLine(axes.coords_to_point(nl + (wr-wl), wr), axes.coords_to_point(0, wr) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
+
+            n_span = str(nr-nl)
+            measures_n.add(MathTex(n_span).move_to((axes.coords_to_point(nl, 0) + axes.coords_to_point(nr, 0))/2 + DOWN * 0.2, UP).scale(0.6))
+
+            w_height = str(wr-wl)
+            shift = LEFT * 0.2
+            if wr-wl < 2:
+                shift = LEFT * (0.6 + 0.3 *(i % 2))
+            measures_w.add(MathTex(w_height).move_to((axes.coords_to_point(0, wl) + axes.coords_to_point(0, wr))/2 + shift, RIGHT).scale(0.6))
+
+            n_sequence += [n_span, ","]
+            w_sequence += [w_height, ","]
+
+        n_sequence.append(r"\cdots")
+        w_sequence.append(r"\cdots")
+
+        return para_plot, measures, measures_n, measures_w, MathTex(*n_sequence), MathTex(*w_sequence)
+
     def construct_scene2(self):
         s,t = 1,2
         N = 57
@@ -270,67 +323,15 @@ class Scene(VoiceoverScene):
             axes_vert = MathTex(f"w_{{ {s},{t} }}(n)").move_to(axes.get_corner(LEFT+UP), DOWN).shift(UP * 0.2)
             self.play(Create(axes), Write(axes_hori), Write(axes_vert))
 
-        def plot_w_dot(axes, N, e):
-            plots = VGroup()
-            for n in range(2, N + 1):
-                for w in range(e.wmin[n], e.wmax[n] + 1):
-                    dot = Dot(axes.coords_to_point(n, w), color=BLUE, radius=0.04)
-                    plots.add(dot)
-            return plots
-
-        def plot_w_para(axes, N, e):
-            necks = [neck for neck in e.necks if neck < N]
-            para_plot = VGroup()
-            measures = VGroup()
-            measures_n = VGroup()
-            measures_w = VGroup()
-            n_sequence = [r"\mbox{span}_n = "]
-            w_sequence = [r"\mbox{height}_w = "]
-            for i in range(len(necks) - 1):
-                nl = necks[i]
-                nr = necks[i + 1]
-                wl = e.wmin[nl]
-                wr = e.wmax[nr]
-                a = axes.coords_to_point(nl, wl)
-                b = axes.coords_to_point(nr - (wr- wl), wl)
-                c = axes.coords_to_point(nr, wr)
-                d = axes.coords_to_point(nl + (wr- wl), wr)
-                para_plot.add(Polygon(a,b,c,d,fill_color=DARK_GREY,fill_opacity=1.0,color=GREY))
-
-                measure_stroke = 1.0
-                measure_dash = 0.04
-                if i == 0:
-                    measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(nl, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
-                    measures.add(DashedLine(axes.coords_to_point(nl, wl), axes.coords_to_point(0, wl) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
-                measures.add(DashedLine(axes.coords_to_point(nr, wr), axes.coords_to_point(nr, 0) + DOWN * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
-                measures.add(DashedLine(axes.coords_to_point(nl + (wr-wl), wr), axes.coords_to_point(0, wr) + LEFT * 0.5, stroke_width=measure_stroke, dash_length=measure_dash))
-
-                n_span = str(nr-nl)
-                measures_n.add(MathTex(n_span).move_to((axes.coords_to_point(nl, 0) + axes.coords_to_point(nr, 0))/2 + DOWN * 0.2, UP).scale(0.6))
-
-                w_height = str(wr-wl)
-                shift = LEFT * 0.2
-                if wr-wl < 2:
-                    shift = LEFT * (0.6 + 0.3 *(i % 2))
-                measures_w.add(MathTex(w_height).move_to((axes.coords_to_point(0, wl) + axes.coords_to_point(0, wr))/2 + shift, RIGHT).scale(0.6))
-
-                n_sequence += [n_span, ","]
-                w_sequence += [w_height, ","]
-
-            n_sequence.append(r"\cdots")
-            w_sequence.append(r"\cdots")
-
-            return para_plot, measures, measures_n, measures_w, MathTex(*n_sequence), MathTex(*w_sequence)
-
         with self.voiceover(text="We plot the function w versus n with s-t ratio of 1 to 2."):
-            plots = plot_w_dot(axes, N, e)
+            plots = self.plot_w_dot(axes, N, e)
             self.play(Create(plots), run_time = 4)
 
         with self.voiceover(text="Because both n and w are integers, our plot is a collection of discrete points."):
             pass
 
         with self.voiceover(text="But we notice that they form a series of parallelograms."):
-            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = plot_w_para(axes, N, e)
+            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = self.plot_w_para(axes, N, e)
             self.play(Create(para_plot))
 
         with self.voiceover(text="These parallelograms all have vertices of 45 degrees, and are connected with each other at those vertices."):
@@ -398,11 +399,11 @@ class Scene(VoiceoverScene):
             axes_vert_2 = MathTex(f"w_{{ {s} , {t} }}(n)").move_to(axes_vert.get_center())
             self.play(TransformMatchingTex(axes_vert, axes_vert_2, transform_mismatches=True))
             old_plots = plots
-            plots = plot_w_dot(axes, N, e)
+            plots = self.plot_w_dot(axes, N, e)
             self.play(Transform(old_plots, plots))
 
         with self.voiceover(text="Similarly, we recognize the series of parallelograms"):
-            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = plot_w_para(axes, N, e)
+            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = self.plot_w_para(axes, N, e)
             self.play(Create(para_plot))
 
         with self.voiceover(text="Again, we measure the span and the height of these parallelograms"):
@@ -465,7 +466,7 @@ class Scene(VoiceoverScene):
         pass
 
     def construct_scene3(self):
-        with self.voiceover("Based on our observation so far, we can formulate our conjecture about the optimal strategy"):
+        with self.voiceover("Based on our observation so far, we can formulate our hypothesis about the optimal strategy"):
             pass
 
         with self.voiceover("The function w is segmented by some nodes n1, n2, n3, and so on"):
@@ -524,15 +525,98 @@ class Scene(VoiceoverScene):
             *[FadeOut(mob)for mob in self.mobjects]
         )
 
+    def construct_scene4(self):
+
+        s,t = math.sqrt(2),math.sqrt(5)
+        k = 10000000000
+        s,t = int(k * s), int(k * t)
+        N = 57
+        e = get_series_at(E_SERIESES, ST(s, t))
+
+        with self.voiceover(text="Let's crank up the irrationality, and use square root of 2 and 5 for s and t"):
+            axes = Axes(x_range=[0,N,5], y_range=[0, N / 2,5], x_length = 10, y_length = 5).shift(DOWN * 0.5)
+            axes_hori = MathTex("n").move_to(axes.get_corner(RIGHT+DOWN), LEFT).shift(RIGHT*0.2)
+            axes_vert = MathTex(r"w_{ \sqrt{2},\sqrt{5} }(n)").move_to(axes.get_corner(LEFT+UP), DOWN).shift(UP * 0.2)
+            self.play(Create(axes), Write(axes_hori), Write(axes_vert))
+
+        with self.voiceover(text="We plot the function w like before"):
+            plots = self.plot_w_dot(axes, N, e)
+            self.play(Create(plots), run_time = 4)
+
+        with self.voiceover(text="It is a little bit harder to see, but we can still find a series of parallelograms"):
+            para_plot, measures, measures_n, measures_w, n_sequence, w_sequence = self.plot_w_para(axes, N, e)
+            self.play(Create(para_plot))
+
+        with self.voiceover(text="Then we measure their spans and heights"):
+            self.play(Create(measures), Create(measures_n), Create(measures_w))
+
+        with self.voiceover(text="and collect them into sequences"):
+            n_sequence.shift(UP * 3).scale(0.6)
+            w_sequence.shift(UP * 2).scale(0.6)
+            self.play(TransformMatchingTex(measures_n, n_sequence))
+            self.play(TransformMatchingTex(measures_w, w_sequence))
+
+        with self.voiceover(text="These are just some random looking number without apparent pattern"):
+            pass
+
+        with self.voiceover(text="Let's computer more terms for one of them and see if we can find anything"):
+            pass
+
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
 
 
+        neck_start = MathTex(r"\mbox{span}_n = ").shift(UP * 3 + LEFT * 5.5)
+        self.play(Write(neck_start))
+        line_cursor = neck_start.get_right() + RIGHT
+        cursor = line_cursor.copy()
+
+        necks = [neck for neck in e.necks if neck < 900]
+        neck_all = VGroup()
+        for i in range(len(necks) - 1):
+            nl = necks[i]
+            nr = necks[i + 1]
+            neck_all.add(MathTex(int(nr - nl), ",").move_to(cursor, LEFT))
+            if i % 10 == 9:
+                line_cursor += DOWN * 0.5
+                cursor = line_cursor.copy()
+            else:
+                cursor += RIGHT
+        self.play(Write(neck_all, run_time=8))
+
+        with self.voiceover(text="Can you see the pattern?"):
+            pass
+        self.wait(3)
+
+        with self.voiceover(text="Let's rearrange these numbers a little bit"):
+            binos = [(k, n- k) for n in range(1, 12) for k in range(n + 1)]
+            binos.sort(key=lambda b: b[0] * s + b[1] * t)
+            ani = []
+            for i in reversed(range(len(neck_all.submobjects))):
+                neck = neck_all.submobjects[i]
+                k, nk = binos[i]
+                n = k + nk
+                ani.append(neck.animate.move_to(UP * 3 + DOWN * n * 0.55 + LEFT * (k - n / 2)))
+            self.play(Succession(*ani), run_time=15)
+
+        with self.voiceover(text="We see these are numbers from binomial coefficients, arranged in an unusual way"):
+            pass
+
+        with self.voiceover(text="But why is it? How is the binary search problem connected to binomial coefficients, as well as the Fibonacci sequence we previously saw?"):
+            pass
+
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
 
 
     def construct(self):
 
         #self.set_speech_service(AzureService())
         self.set_speech_service(GTTSService())
-        #self.construct_scene1()
-        #self.construct_scene2()
+        self.construct_scene1()
+        self.construct_scene2()
         self.construct_scene3()
+        self.construct_scene4()
 
