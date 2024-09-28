@@ -274,8 +274,8 @@ class Scene(VoiceoverScene):
         measures = VGroup()
         measures_n = VGroup()
         measures_w = VGroup()
-        n_sequence = [r"\mbox{span}_n = "]
-        w_sequence = [r"\mbox{height}_w = "]
+        n_sequence = [r"\mbox{Span}_n = "]
+        w_sequence = [r"\mbox{Height}_w = "]
         for i in range(len(necks) - 1):
             nl = necks[i]
             nr = necks[i + 1]
@@ -567,7 +567,7 @@ class Scene(VoiceoverScene):
         )
 
 
-        neck_start = MathTex(r"\mbox{span}_n = ").shift(UP * 3 + LEFT * 5.5)
+        neck_start = MathTex(r"\mbox{Span}_n = ").shift(UP * 3 + LEFT * 5.5)
         self.play(Write(neck_start))
         line_cursor = neck_start.get_right() + RIGHT
         cursor = line_cursor.copy()

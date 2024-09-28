@@ -1,5 +1,6 @@
 
 from typing import NamedTuple, List
+import math
 import sys
 sys.setrecursionlimit(10000)
 
@@ -120,3 +121,98 @@ def get_series_at(eserieses: list[Eseries], st: ST) -> Eseries:
         return geq_e
     return eserieses[geq_i-1]
 
+def sgn(i):
+    if i > 0:
+        return 1
+    elif i < 0:
+        return -1
+    else:
+        return 0
+
+class AlgebraicR2:
+    def __init__(self, A, B, a, b):
+        self.A = A
+        self.B = B
+        self.a = a
+        self.b = b
+
+    def __add__(self, o):
+        assert self.A == o.A
+        assert self.B == o.B
+        return AlgebraicR2(self.A, self.B, self.a + o.a, self.b + o.b)
+
+    def __sub__(self, o):
+        assert self.A == o.A
+        assert self.B == o.B
+        return AlgebraicR2(self.A, self.B, self.a - o.a, self.b - o.b)
+
+    def __mul__(self, o):
+        return AlgebraicR2(self.A, self.B, self.a * o, self.b * o)
+
+    def __eq__(self, o):
+        assert self.A == o.A
+        assert self.B == o.B
+        return self.a == o.a and self.b == o.b
+
+    def __ne__(self, o):
+        assert self.A == o.A
+        assert self.B == o.B
+        return self.a != o.a or self.b != o.b
+
+    def cm(self, o, f):
+        assert self.A == o.A
+        assert self.B == o.B
+        left = self.a - o.a
+        right = o.b - self.b
+        left = left * left * sgn(left) * self.A
+        right = right * right * sgn(right) * self.B
+        return f(left, right)
+
+    def __lt__(self, o):
+        return self.cm(o, lambda x,y: x < y)
+
+    def __le__(self, o):
+        return self.cm(o, lambda x,y: x <= y)
+
+    def __gt__(self, o):
+        return self.cm(o, lambda x,y: x > y)
+
+    def __ge__(self, o):
+        return self.cm(o, lambda x,y: x >= y)
+
+    def __repr__(self):
+        return f"{self.a}√{self.A} + {self.b}√{self.B}"
+
+    def value(self):
+        return self.a * math.sqrt(self.A) + self.b * math.sqrt(self.B)
+
+def calc_irr(A: int, B: int, n_max: int):
+    s = AlgebraicR2(A, B, 1, 0)
+    t = AlgebraicR2(A, B, 0, 1)
+
+    E = [ s * 0 for _ in range(n_max + 1) ]
+    wmin = [0] * (n_max + 1)
+    wmax = [0] * (n_max + 1)
+
+    E[1] = E[0] = s * 0
+    E[2] = s + t
+    wmin[2] = wmax[2] = 1
+
+
+    for n in range(3, n_max + 1):
+        wcan = [wmin[n - 1], wmin[n - 1] + 1, wmax[n - 1], wmax[n - 1] + 1]
+        d = [E[w] + E[n - w] + t * w + s * (n - w) for w in wcan]
+        new_min = new_max = wcan[0]
+        new_e = d[0]
+        for (w, d) in zip(wcan[1:], d[1:]):
+            if d < new_e:
+                new_e = d
+                new_min = new_max = w
+            elif d == new_e:
+                new_min = min(new_min, w)
+                new_max = max(new_max, w)
+        E[n] = new_e
+        wmin[n] = new_min
+        wmax[n] = new_max
+
+    return (E, wmin, wmax)
