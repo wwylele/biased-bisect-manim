@@ -3,6 +3,8 @@ from manim_voiceover import VoiceoverScene
 from manim_voiceover.services.gtts import GTTSService
 from manim_voiceover.services.azure import AzureService
 import scipy.special
+import numpy.linalg
+import itertools
 
 from calculate import *
 import math
@@ -478,7 +480,7 @@ class Scene(VoiceoverScene):
                 self.play(Write(trigL[0][k]), Write(trigR[0][k]), Write(trigL[k][0]), Write(trigR[k][0]), run_time=0.1)
 
         with self.voiceover(text="We can recursively construct two triangles"):
-            for k in range(3, 7):
+            for k in range(3, 8):
                 for p in range(1, k):
                     q = k - p
                     trigL[p][q] = MathTex(f"{p}s + {q}t").scale(0.6).move_to(tri_pos(p, q) + latD * LEFT)
@@ -494,13 +496,504 @@ class Scene(VoiceoverScene):
             allL = MathTex(r"p+q\choose p").move_to(RIGHT* 3.5 + DOWN *3)
             self.play(Write(allL))
 
-        self.wait(3)
-        pass
+        with self.voiceover(text="Since the recurrence formula for each side are based on the same n"):
+            pass
 
+        with self.voiceover(text="This establishes a one-to-one correspondence between the two triangles"):
+            corr = DoubleArrow(DOWN * 3 + LEFT, DOWN*3 + RIGHT)
+            self.play(Create(corr))
+
+        with self.voiceover(text="Except this only works when s over t is irrational"):
+            pass
+
+        with self.voiceover(text="If we have rational configuration, say s equals one and t equals 2"):
+            st_exa = MathTex("s = 1, t = 2").scale(0.8).move_to(UP * 1.9 + LEFT * 5.7)
+            s = 1
+            t = 2
+            self.play(Write(st_exa))
+
+            for p in range(len(trigL)):
+                for q in range(len(trigL[p])):
+                    tl = trigL[p][q]
+                    if tl is None:
+                        continue
+                    self.play(Transform(tl, MathTex(int(p * s + q * t), color=tl.get_color())
+                                        .scale(0.8).move_to(tl.get_center())), run_time = 0.1)
+
+        with self.voiceover(text="We see a lot of repeating numbers on the left"):
+            for leftv in range(1, 20):
+                pqs = [(p,q) for p in range(len(trigL)) for q in range(len(trigL[p]))
+                       if trigL[p][q] is not None and p * s + q * t == leftv]
+                if len(pqs) == 0 or len(pqs) == 1:
+                    continue
+                pq0 = tri_pos(*min(pqs, key=lambda pq: pq[0])) + latD * LEFT
+                pq1 = tri_pos(*min(pqs, key=lambda pq: pq[1])) + latD * LEFT
+                pq0b = pq0 + (pq0 - pq1) / numpy.linalg.norm(pq0 - pq1) * 0.2
+                pq1b = pq1 + (pq1 - pq0) / numpy.linalg.norm(pq0 - pq1) * 0.2
+                pqLine = Line(pq0b, pq1b, stroke_width = 30, stroke_opacity=0.4, color=RED)
+                self.play(Create(pqLine), run_time = 0.3)
+
+        with self.voiceover(text="If we group numbers in the same way on the right"):
+            for leftv in range(1, 20):
+                pqs = [(p,q) for p in range(len(trigL)) for q in range(len(trigL[p]))
+                       if trigL[p][q] is not None and p * s + q * t == leftv]
+                if len(pqs) == 0 or len(pqs) == 1:
+                    continue
+                pq0 = tri_pos(*min(pqs, key=lambda pq: pq[0])) + latD * RIGHT
+                pq1 = tri_pos(*min(pqs, key=lambda pq: pq[1])) + latD * RIGHT
+                pq0b = pq0 + (pq0 - pq1) / numpy.linalg.norm(pq0 - pq1) * 0.2
+                pq1b = pq1 + (pq1 - pq0) / numpy.linalg.norm(pq0 - pq1) * 0.2
+                pqLine = Line(pq0b, pq1b, stroke_width = 30, stroke_opacity=0.4, color=ORANGE)
+                self.play(Create(pqLine), run_time = 0.3)
+
+        with self.voiceover(text="And take the sum of each group"):
+            self.play(Create(MathTex("1", color=BLUE).move_to(trigR[1][1].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+            self.play(Create(MathTex("1", color=BLUE).move_to(trigR[0][2].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+            self.play(Create(MathTex("2", color=BLUE).move_to(trigR[1][2].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+            self.play(Create(MathTex("3", color=BLUE).move_to(trigR[0][3].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+            self.play(Create(MathTex("5", color=BLUE).move_to(trigR[1][3].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+            self.play(Create(MathTex("8", color=BLUE).move_to(trigR[0][4].get_center()+LEFT*0.3 + UP * 0.2)), run_time=0.5)
+
+            pass
+
+        with self.voiceover(text="We see these are numbers in Fibonacci sequence"):
+            pass
+
+        with self.voiceover(text="In fact, one can prove that taking sums along a certain direction in Pascal's triangle will always produce a Fibonacci-like sequence"):
+            pass
+
+        with self.voiceover(text="This explains why we see them for rational s over t"):
+            pass
+
+        with self.voiceover(text="With function E now understood, now let's look at the w function again"):
+            self.play(
+                *[FadeOut(mob)for mob in self.mobjects]
+            )
+
+            pass
+
+        with self.voiceover(text="Let's bring back the triplet of lines from E prime"):
+            EnL, EnR = 2 * UP + LEFT * 6, 2 * UP + LEFT * 1
+            EwL, EwR = LEFT * 5, LEFT * 2
+            EnwL, EnwR = 2 * DOWN + LEFT * 4.5, 2 * DOWN + LEFT * 2.5
+
+            EnSpan = 5
+            EwSpan = 3
+            EnwSpan = 2
+
+            LineEn = Line(EnL, EnR, stroke_width = 6, color=RED)
+            LineEw = Line(EwL, EwR, stroke_width = 6, color=GREEN)
+            LineEnw = Line(EnwL, EnwR, stroke_width = 6, color=BLUE)
+            TextEn = MathTex("n", color=RED).move_to(2 * UP + LEFT * 6.7, LEFT)
+            TextEw = MathTex("w_{s,t}", color=GREEN).move_to(LEFT * 6.7, LEFT)
+            TextEnw = MathTex("n - w_{s,t}", color=BLUE).move_to(2 * DOWN + LEFT * 6.7, LEFT)
+
+            self.play(Create(LineEn), Create(LineEw), Create(LineEnw),
+                      Write(TextEn), Write(TextEw), Write(TextEnw))
+
+        def lerp(a, b, x):
+            return a * (1-x) + b * x
+
+        with self.voiceover(text="We pick one point on each span that satisfy the constraint"):
+            EnX = EnSpan * 0.3
+            EwX = EwSpan * 0.3
+            EnwX = EnwSpan * 0.3
+            EnP = Dot(lerp(EnL, EnR, EnX/EnSpan), color=RED, radius=0.1)
+            EwP = Dot(lerp(EwL, EwR, EwX/EwSpan), color=GREEN, radius=0.1)
+            EnwP = Dot(lerp(EnwL, EnwR, EnwX/EnwSpan), color=BLUE, radius=0.1)
+            self.play(Create(EnP), Create(EwP), Create(EnwP))
+
+        with self.voiceover(text="Let's also track the value of n and w in a plane"):
+            EnOff = 1
+            EwOff = 1
+            axes = Axes([0, 7], [0, 5], 6, 6/7*5).move_to(RIGHT * 3)
+            axes_hori = MathTex("n", color=RED).move_to(axes.get_corner(RIGHT+DOWN), LEFT)
+            axes_vert = MathTex("w_{s,t}", color=GREEN).move_to(axes.get_corner(LEFT+UP), DOWN)
+            slideEn = Line(axes.coords_to_point(EnOff, 0), axes.coords_to_point(EnSpan + EnOff, 0), stroke_width = 5, color=RED)
+            slideEw = Line(axes.coords_to_point(0, EwOff), axes.coords_to_point(0, EwOff + EwSpan), stroke_width = 5, color=GREEN)
+            self.play(Create(axes), Create(axes_hori), Create(axes_vert), Create(slideEn), Create(slideEw))
+
+            trackEn = DashedLine(axes.coords_to_point(EnX + EnOff, 0), axes.coords_to_point(EnX + EnOff, EwX + EwOff), color=RED)
+            trackEw = DashedLine(axes.coords_to_point(0, EwX + EwOff), axes.coords_to_point(EnX + EnOff, EwX + EwOff), color=GREEN)
+            self.play(Create(trackEn), Create(trackEw))
+            trackP = Dot(axes.coords_to_point(EnX + EnOff, EwX + EwOff))
+            self.play(Create(trackP))
+
+        def ani_move(toEnX, toEwX):
+            nonlocal EnX, EwX, EnwX, EnP, EwP, EnwP, trackEn, trackEw, trackP
+            EnX = toEnX
+            EwX = toEwX
+            EnwX = EnX - EwX
+            return [EnP.animate.move_to(lerp(EnL, EnR, EnX/EnSpan)),
+                    EwP.animate.move_to(lerp(EwL, EwR, EwX/EwSpan)),
+                    EnwP.animate.move_to(lerp(EnwL, EnwR, EnwX/EnwSpan)),
+                    Transform(trackEn, DashedLine(axes.coords_to_point(EnX + EnOff, 0), axes.coords_to_point(EnX + EnOff, EwX + EwOff), color=RED)),
+                    Transform(trackEw, DashedLine(axes.coords_to_point(0, EwX + EwOff), axes.coords_to_point(EnX + EnOff, EwX + EwOff), color=GREEN)),
+                    trackP.animate.move_to(axes.coords_to_point(EnX + EnOff, EwX + EwOff))
+                    ]
+
+        with self.voiceover(text="We first move all three points to the left end"):
+            self.play(*ani_move(0, 0))
+
+        with self.voiceover(text="and let them slide to the right end"):
+            toEnX = EnSpan
+            toEwX = EwSpan
+            para_diag=Line(axes.coords_to_point(EnX + EnOff, EwX + EwOff), axes.coords_to_point(toEnX + EnOff, toEwX + EwOff))
+            self.play(*ani_move(toEnX, toEwX), Create(para_diag), run_time=3)
+
+        with self.voiceover(text="This gives us a line of possible n and w values"):
+            pass
+
+        with self.voiceover(text="However, this is not the only possible configuration"):
+            pass
+
+        with self.voiceover(text="We can keep the w at the right end, and slide n leftwards"):
+            toEnX = EwSpan
+            toEwX = EwSpan
+            para_up=Line(axes.coords_to_point(EnX + EnOff, EwX + EwOff), axes.coords_to_point(toEnX + EnOff, toEwX + EwOff))
+            self.play(*ani_move(toEnX, toEwX), Create(para_up), run_time=3)
+
+        with self.voiceover(text="We can do this till n minus w hits the left end"):
+            pass
+
+        with self.voiceover(text="Then we can slide both n and w leftwards till all of them hits the end"):
+            toEnX = 0
+            toEwX = 0
+            para_left=Line(axes.coords_to_point(EnX + EnOff, EwX + EwOff), axes.coords_to_point(toEnX + EnOff, toEwX + EwOff))
+            self.play(*ani_move(toEnX, toEwX), Create(para_left), run_time=3)
+
+        with self.voiceover(text="Similarly, we can keep w at the left end while sliding n rightwards"):
+            toEnX = EnwSpan
+            toEwX = 0
+            para_down=Line(axes.coords_to_point(EnX + EnOff, EwX + EwOff), axes.coords_to_point(toEnX + EnOff, toEwX + EwOff))
+            self.play(*ani_move(toEnX, toEwX), Create(para_down), run_time=3)
+
+        with self.voiceover(text="till n minus w hits the right end"):
+            pass
+
+        with self.voiceover(text="and then we slide all of them to the right end"):
+            toEnX = EnSpan
+            toEwX = EwSpan
+            para_right=Line(axes.coords_to_point(EnX + EnOff, EwX + EwOff), axes.coords_to_point(toEnX + EnOff, toEwX + EwOff))
+            self.play(*ani_move(toEnX, toEwX), Create(para_right), run_time=3)
+
+        with self.voiceover(text="We have tracked the boundary of a parallelogram"):
+            pass
+
+        with self.voiceover(text="It is not hard to see that all intermediate configurations are also valid"):
+            pass
+
+        with self.voiceover(text="Hence the entire solid parallelogram represents possible value of w"):
+            para = Polygon(axes.coords_to_point(EnOff, EwOff),
+                           axes.coords_to_point(EnOff + EwSpan, EwOff + EwSpan),
+                           axes.coords_to_point(EnOff + EnSpan, EwOff + EwSpan),
+                           axes.coords_to_point(EnOff - EwSpan + EnSpan, EwOff),
+                           fill_color=DARK_GREY,fill_opacity=1.0,color=GREY)
+            self.play(Create(para))
+
+        with self.voiceover(text="Or to be precise, all integral points in the parallelogram"):
+            para_dots = VGroup()
+            for n in range(EnSpan + 1):
+                for w in range(max(0, EwSpan + 1)):
+                    nw = n - w
+                    if nw < 0 or nw > EnwSpan:
+                        continue
+                    para_dots.add(Dot(axes.coords_to_point(EnOff + n, EwOff + w)))
+            self.play(Create(para_dots))
+
+        with self.voiceover(text="This explains why the plot for w consists of a series of parallelogram"):
+            pass
+
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
+
+    def construct_scene3(self):
+        with self.voiceover(text="Let's recap with a way to compute function E and w"):
+            pass
+
+        max_row = 13
+        pasc = [[None for _ in range(max_row + 1)] for _ in range(max_row + 1)]
+        tagd = [[None for _ in range(max_row + 1)] for _ in range(max_row + 1)]
+        tagw = [[None for _ in range(max_row + 1)] for _ in range(max_row + 1)]
+
+        with self.voiceover(text="We first list binomial coefficients with Pascal's triangle"):
+            for row in range(0, max_row + 1):
+                for k in reversed(range(0, row + 1)):
+                    p, q, = k, row - k
+                    content = str(int(scipy.special.comb(row, k)))
+                    scale = 1.0 if len(content) < 3 else 0.8
+                    pasc[p][q] = MathTex(content).scale(scale).move_to((k - row / 2) * LEFT + UP * 3.5 + DOWN * row)
+                    self.play(Write(pasc[p][q]), run_time = 0.1 if row < 8 else 0.01)
+
+        with self.voiceover(text="We then add a yellow tag to each binomial coefficients in a specific way"):
+            pass
+
+        TAGD_OFF = DOWN * 0.35
+        TAGW_OFF = UP * 0.35
+
+        with self.voiceover(text="We tag the one on the top with s plus t"):
+            tagd[0][0] = MathTex("1s + 1t", color=YELLOW).scale(0.5).move_to(pasc[0][0].get_center() + TAGD_OFF)
+            self.play(Write(tagd[0][0]))
+
+        with self.voiceover(text="And when we move one number towards bottom left, we add another s; when we move one number toward bottom right, we add another t"):
+            arrow_s = Arrow(pasc[0][0].get_center() + LEFT, pasc[6][0].get_center() + LEFT, color=YELLOW)
+            arrow_t = Arrow(pasc[0][0].get_center() + RIGHT, pasc[0][6].get_center() + RIGHT, color=YELLOW)
+            self.play(Create(arrow_s), Create(arrow_t))
+            text_s = MathTex("+s", color=YELLOW).move_to(arrow_s.get_center() + LEFT)
+            text_t = MathTex("+t", color=YELLOW).move_to(arrow_t.get_center() + RIGHT)
+            self.play(Write(text_s), Write(text_t))
+            for row in range(1, max_row + 1):
+                for k in reversed(range(0, row + 1)):
+                    p, q, = k, row - k
+                    tagd[p][q] = MathTex(f"{p+1}s + {q+1}t", color=YELLOW).scale(0.5).move_to(pasc[p][q].get_center() + TAGD_OFF)
+                    self.play(Write(tagd[p][q]), run_time = 0.2 if row < 8 else 0.01)
+
+        with self.voiceover(text="To give a more concrete example"):
+            pass
+
+        with self.voiceover(text="Let's say s and t are 2 and 3 respectively"):
+            s, t = 2,3
+            st = MathTex(f"s = {s}, t = {t}", color=YELLOW).move_to(LEFT * 5.5 + UP * 3.5)
+            self.play(Write(st))
+
+        with self.voiceover(text="and calculate the values of all tags"):
+            for row in range(0, max_row + 1):
+                for k in reversed(range(0, row + 1)):
+                    p, q, = k, row - k
+                    new_tagd = MathTex(str(s * (p + 1) +t * (q + 1)), color=YELLOW).scale(0.6).move_to(tagd[p][q].get_center())
+                    self.play(Transform(tagd[p][q], new_tagd), run_time = 0.2 if row < 8 else 0.01)
+
+        with self.voiceover(text="We also add a blue tag to each number"):
+            pass
+
+        with self.voiceover(text="by copying the number from its left shoulder"):
+            for row in range(1, max_row + 1):
+                for k in reversed(range(0, row)):
+                    p, q, = k, row - k
+                    tagw[p][q] = pasc[p][q - 1].copy()
+                    target = MathTex(str(int(scipy.special.comb(row-1, k))), color=BLUE).scale(0.6).move_to(pasc[p][q].get_center() + TAGW_OFF)
+                    self.play(Transform(tagw[p][q], target), run_time = 0.2 if row < 8 else 0.01)
+
+        with self.voiceover(text="By the convention of extended Pascal's triangle, we tag all numbers on the left side with zeros"):
+            for row in range(1, max_row + 1):
+                k = row
+                p, q, = k, row - k
+                tagw[p][q] =  MathTex("0", color=BLUE).scale(0.6).move_to(pasc[p][q].get_center() + TAGW_OFF)
+                self.play(Write(tagw[p][q]), run_time = 0.3)
+
+        with self.voiceover(text="The only exception is the one on the top, whose blue tag we will leave as undefined"):
+            tagw[0][0] = MathTex(r"\mathrm{undef}", color=BLUE).scale(0.6).move_to(pasc[0][0].get_center() + TAGW_OFF)
+            self.play(Write(tagw[0][0]))
+
+        internal = []
+        external = []
+        for row in range(0, max_row + 1):
+            for k in reversed(range(0, row + 1)):
+                p, q, = k, row - k
+                white = int(scipy.special.comb(row, k))
+                yellow = s * (p + 1) +t * (q + 1)
+                blue = int(scipy.special.comb(row-1, k)) if (p, q) != (0, 0) else 0
+                internal.append([p, q, white, yellow, blue])
+
+        internal.sort(key = lambda i: (i[3], i[0]))
+
+        el_between = 0.6
+        el_start = 6.5
+        with self.voiceover(text="Next, we sort them by the yellow tag in ascending order"):
+            self.play(FadeOut(arrow_s, arrow_t, text_s, text_t))
+            anime = []
+            for i, (p, q, white, yellow, blue) in enumerate(internal):
+                pos = i * RIGHT * el_between + LEFT * el_start
+                anime += [pasc[p][q].animate.move_to(pos),
+                          tagw[p][q].animate.move_to(pos + TAGW_OFF),
+                          tagd[p][q].animate.move_to(pos + TAGD_OFF)]
+                external.append((pasc[p][q], tagd[p][q], tagw[p][q]))
+            self.play(*anime)
+            asc_arrow = Arrow(DOWN + LEFT * 6, DOWN + RIGHT * 6, color=YELLOW)
+            self.play(Create(asc_arrow))
+
+        with self.voiceover(text="For elements with equal yellow tags"):
+            equal_rects = []
+            for _, g in itertools.groupby(enumerate(internal), lambda i: i[1][3]):
+                g = list(g)
+                if len(g) == 1:
+                    continue
+                left = g[0][0]
+                right = g[-1][0]
+                equal_rect = Polygon(external[left][1].get_corner(LEFT + UP) + LEFT * 0.1 + UP * 0.1,
+                                     external[left][1].get_corner(LEFT + DOWN) + LEFT * 0.1 + DOWN * 0.1,
+                                     external[right][1].get_corner(RIGHT + DOWN) + RIGHT * 0.1 + DOWN * 0.1,
+                                     external[right][1].get_corner(RIGHT + UP) + RIGHT * 0.1 + UP * 0.1,
+                                     color=RED)
+                equal_rects.append((left, right, equal_rect))
+            self.play(*[Create(e[2]) for e in equal_rects])
+
+        with self.voiceover(text="We merge them by summing up white and blue numbers"):
+            anime = []
+            for left, right, rect in equal_rects:
+                internal[left][4] = int(sum(internal[i][4] for i in range(left, right + 1)))
+                internal[left][2] = int(sum(internal[i][2] for i in range(left, right + 1)))
+                white_content = str(internal[left][2])
+                white_scale = 1.0 if len(white_content) < 3 else 0.6
+                anime += [Transform(external[left][0], MathTex(white_content).scale(white_scale).move_to(external[left][0].get_center())),
+                          Transform(external[left][2], MathTex(str(internal[left][4]), color=BLUE).scale(0.6).move_to(external[left][2].get_center())),
+                          Transform(rect, Polygon(external[left][1].get_corner(LEFT + UP) + LEFT * 0.1 + UP * 0.1,
+                                     external[left][1].get_corner(LEFT + DOWN) + LEFT * 0.1 + DOWN * 0.1,
+                                     external[left][1].get_corner(RIGHT + DOWN) + RIGHT * 0.1 + DOWN * 0.1,
+                                     external[left][1].get_corner(RIGHT + UP) + RIGHT * 0.1 + UP * 0.1,
+                                     color=RED))
+                ] + \
+                [FadeOut(external[i][0], shift = LEFT * (i - left ) * el_between) for i in range(left + 1, right + 1)] + \
+                [FadeOut(external[i][1], shift = LEFT * (i - left ) * el_between) for i in range(left + 1, right + 1)] + \
+                [FadeOut(external[i][2], shift = LEFT * (i - left ) * el_between) for i in range(left + 1, right + 1)]
+
+            self.play(*anime)
+
+            self.play(FadeOut(*[rect for _, _, rect in equal_rects]))
+            for left, right, _ in reversed(equal_rects):
+                del internal[left+1:right+1]
+                del external[left+1:right+1]
+
+            anime = []
+            for i, (white, yellow, blue) in enumerate(external):
+                pos = i * RIGHT * el_between + LEFT * el_start
+                anime += [
+                    white.animate.move_to(pos),
+                    blue.animate.move_to(pos + TAGW_OFF),
+                    yellow.animate.move_to(pos + TAGD_OFF)
+                ]
+            self.play(*anime)
+
+        with self.voiceover(text="We can then use these numbers to construct E and w functions"):
+            self.play(FadeOut(asc_arrow))
+            anime = []
+            for white, yellow, blue in external:
+                anime += [white.animate.shift(DOWN*3),
+                        yellow.animate.shift(DOWN*3),
+                        blue.animate.shift(DOWN*3)]
+            self.play(*anime)
+
+
+        with self.voiceover(text="We first focus on white and yellow numbers"):
+            cursor = SurroundingRectangle(VGroup(external[0][0], external[0][1]))
+            axes = Axes([0, 10, 1], [0, 80, 10], 9, 5).shift(UP * 0.5)
+            self.play(Create(cursor), Create(axes))
+
+        with self.voiceover(text=f"The first pair of them is {internal[0][2]} and {internal[0][3]}"):
+            pass
+
+        segments = []
+        segments_text = []
+        epoints = []
+        i = 0
+        with self.voiceover(text=f"So starting from point one, zero, we draw a vector of horizontal span {internal[i][2]} and slop {internal[i][3]}"):
+            pointxy = numpy.array([1, 0])
+            point = Dot(axes.coords_to_point(*pointxy))
+            start_text = MathTex("(1, 0)").scale(0.6).move_to(point.get_center(), RIGHT+UP)
+            self.play(Create(point), Write(start_text))
+
+            pointxy2 = pointxy + numpy.array([internal[i][2], internal[i][2] * internal[i][3]])
+            segments.append(Arrow(axes.coords_to_point(*pointxy), axes.coords_to_point(*pointxy2), buff=0))
+            stext = MathTex("+(", str(internal[i][2]) , ",", str(internal[i][2]), r"\cdot", str(internal[i][3]) , ")", color=RED).scale(0.6).move_to(segments[-1].get_center(), RIGHT+DOWN)
+            stext.submobjects[1].set_color(WHITE)
+            stext.submobjects[3].set_color(WHITE)
+            stext.submobjects[5].set_color(YELLOW)
+            segments_text.append(stext)
+            self.play(Create(segments[-1]), Write(segments_text[-1]))
+            for n in range(pointxy[0] + 1, pointxy2[0] + 1):
+                l = (n - pointxy[0]) / (pointxy2[0] - pointxy[0])
+                p = (1-l ) * pointxy + l * pointxy2
+                epoints.append(Dot(axes.coords_to_point(*p)))
+            pointxy = pointxy2
+
+        with self.voiceover(text="Similarly, for each pair of white and yellow numbers"):
+            pass
+
+        with self.voiceover(text="We add a new vector with horizontal span equal to the white number, and slope equal to the yellow number"):
+            for i in range(1, 6):
+                self.play(Transform(cursor, SurroundingRectangle(VGroup(external[i][0], external[i][1]))))
+
+                pointxy2 = pointxy + numpy.array([internal[i][2], internal[i][2] * internal[i][3]])
+                segments.append(Arrow(axes.coords_to_point(*pointxy), axes.coords_to_point(*pointxy2), buff=0))
+                stext = MathTex("+(", str(internal[i][2]) , ",", str(internal[i][2]), r"\cdot", str(internal[i][3]) , ")", color=RED).scale(0.6).move_to(segments[-1].get_center(), RIGHT+DOWN)
+                stext.submobjects[1].set_color(WHITE)
+                stext.submobjects[3].set_color(WHITE)
+                stext.submobjects[5].set_color(YELLOW)
+                segments_text.append(stext)
+                self.play(Create(segments[-1]), Write(segments_text[-1]))
+                for n in range(pointxy[0] + 1, pointxy2[0] + 1):
+                    l = (n - pointxy[0]) / (pointxy2[0] - pointxy[0])
+                    p = (1-l ) * pointxy + l * pointxy2
+                    epoints.append(Dot(axes.coords_to_point(*p)))
+                pointxy = pointxy2
+
+        with self.voiceover(text="This is the plot of function E"):
+            self.play(*[s.animate.set_color(GRAY_E) for s in segments])
+            self.play(*[Create(d) for d in epoints])
+            hori = MathTex("n").move_to(axes.get_corner(RIGHT + DOWN), LEFT)
+            vert = MathTex("E_{s,t}(n)").move_to(axes.get_corner(UP + LEFT), RIGHT)
+            self.play(Create(hori), Create(vert))
+
+            self.wait(3)
+
+        self.play(FadeOut(hori, vert, point, axes, start_text), FadeOut(*segments), FadeOut(*epoints), FadeOut(*segments_text))
+
+        with self.voiceover(text="Now we move our focus to white and blue numbers"):
+            i = 0
+            self.play(Transform(cursor, SurroundingRectangle(VGroup(external[i][0], external[i][2]))))
+            axes = Axes([0, 30, 1], [0, 15, 1], 10, 5).shift(UP * 0.5)
+            self.play(Create(axes))
+
+        with self.voiceover(text="The first blue number is undefined, so we skip it. This corresponding to the fact that w one is also undefined"):
+            pass
+
+        with self.voiceover(text="We start from the point two one"):
+            pointxy = numpy.array([2, 1])
+            point = Dot(axes.coords_to_point(*pointxy))
+            start_text = MathTex("(2, 1)").scale(0.6).move_to(point.get_center(), RIGHT+UP)
+            self.play(Create(point), Write(start_text))
+
+        paras = []
+        paradots = VGroup()
+        with self.voiceover(text="For each pair of white and blue numbers, we draw a parallelogram with horizontal span equal to the white number, and height equal to the yellow number"):
+            for i in range(1, 10):
+                self.play(Transform(cursor, SurroundingRectangle(VGroup(external[i][0], external[i][2]))))
+                pointxy2 = pointxy + numpy.array([internal[i][2], internal[i][4]])
+                u = pointxy + numpy.array([internal[i][4], internal[i][4]])
+                v = pointxy2 - numpy.array([internal[i][4], internal[i][4]])
+
+                for dx in range(1, internal[i][2] + 1):
+                    low = max(0, internal[i][4] - (internal[i][2] - dx))
+                    high = min(internal[i][4], dx)
+                    for dy in range(low, high + 1):
+                        paradots.add(Dot(axes.coords_to_point(dx + pointxy[0], dy + pointxy[1])))
+
+                paras.append(Polygon(axes.coords_to_point(*pointxy),
+                                     axes.coords_to_point(*u),
+                                     axes.coords_to_point(*pointxy2),
+                                     axes.coords_to_point(*v),fill_opacity=0.5, fill_color=GREY, stroke_color=WHITE))
+                self.play(Create(paras[-1]))
+                pointxy = pointxy2
+
+        with self.voiceover(text="This becomes the plot of the w function"):
+            self.play(Create(paradots))
+
+            hori = MathTex("n").move_to(axes.get_corner(RIGHT + DOWN), LEFT)
+            vert = MathTex("w_{s,t}(n)").move_to(axes.get_corner(UP + LEFT), RIGHT)
+            self.play(Create(hori), Create(vert))
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
 
     def construct(self):
 
         #self.set_speech_service(AzureService())
         self.set_speech_service(GTTSService())
         #self.construct_scene1()
-        self.construct_scene2()
+        #self.construct_scene2()
+        self.construct_scene3()
