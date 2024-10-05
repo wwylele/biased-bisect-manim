@@ -100,10 +100,10 @@ class Scene(VoiceoverScene):
             self.play(Create(segs))
             pass
 
-        with self.voiceover(text="Starting from this point, I am not going to explain very rigorously, because I don't want the video to be too long."):
+        with self.voiceover(text="Starting from this point, be aware that I am going to do things that are not very rigorous."):
             pass
 
-        with self.voiceover(text="And I will start doing that by... computing and plotting the derivative of E"):
+        with self.voiceover(text="And the first wild thing I am going to do... computing and plotting the derivative of E"):
             dE = MathTex(r"\frac{\mathrm{d}E_{s,t}}{\mathrm{d}n}\ ?").shift(UP * 2)
             self.play(Write(dE))
 
@@ -126,7 +126,7 @@ class Scene(VoiceoverScene):
                 der_plot.add(Line(axes.coords_to_point(i, d), axes.coords_to_point(i + 1, d)))
             self.play(Create(der_plot))
 
-        with self.voiceover(text="We can see a few flat lines in the plot"):
+        with self.voiceover(text="We can see a few flat segments in the plot"):
             pass
 
         with self.voiceover(text="Let's measure their length"):
@@ -143,7 +143,7 @@ class Scene(VoiceoverScene):
         with self.voiceover(text="We can see these are the same number sequence we saw from the plot for function w, a particular arrangement of binomial coefficients"):
             pass
 
-        with self.voiceover(text="Let's also label these flat lines with the value of E prime"):
+        with self.voiceover(text="Let's also label these segments with the value of E prime"):
             spder = VGroup()
             for i in range(1, len(necks)):
                 left = necks[i - 1]
@@ -163,7 +163,7 @@ class Scene(VoiceoverScene):
         with self.voiceover(text="By carefully comparing these numbers"):
             pass
 
-        with self.voiceover(text="We can observe a correspondence between the length of flat lines and the derivatives"):
+        with self.voiceover(text="We can observe a correspondence between the length of segments and E prime"):
             corres = MathTex("(p+1)s + (q+1)t", r"\leftrightarrow", r"\frac{(p+q)!}{p!q!}={p+q\choose p}").shift(DOWN + RIGHT)
             corres.get_part_by_tex("(p+1)s + (q+1)t").set_color(BLUE)
             corres.get_part_by_tex(r"\frac{(p+q)!}{p!q!}={p+q\choose p}").set_color(YELLOW)
@@ -271,7 +271,7 @@ class Scene(VoiceoverScene):
         EwL, EwR = get_plate(dEw)
         EnwL, EnwR = get_plate(dEnw)
 
-        with self.voiceover(text="We see that the three terms in the equation correspond to three flat lines in the plot"):
+        with self.voiceover(text="We see that the three terms in the equation correspond to three segments in the plot"):
             EnTL, EnTR = axes.coords_to_point(EnL, dEn.value()), axes.coords_to_point(EnR, dEn.value())
             EwTL, EwTR = axes.coords_to_point(EwL, dEw.value()), axes.coords_to_point(EwR, dEw.value())
             EnwTL, EnwTR = axes.coords_to_point(EnwL, dEnw.value()), axes.coords_to_point(EnwR, dEnw.value())
@@ -294,7 +294,7 @@ class Scene(VoiceoverScene):
             EnwDisT = MathTex("s", color=BLUE).move_to(EnwDis.get_right()+RIGHT*0.1, LEFT)
             self.play(Create(EwDis), Create(EnwDis), Write(EwDisT), Write(EnwDisT))
 
-        with self.voiceover(text="Meanwhile, we can find a point on each line"):
+        with self.voiceover(text="Meanwhile, we can find a point on each segment"):
             j = 0.3
             EnP = (1-j) * EnL + j *EnR
             EwP = (1-j) * EwL + j *EwR
@@ -314,7 +314,7 @@ class Scene(VoiceoverScene):
             EnwDropText = MathTex("n-w", color=BLUE).move_to(axes.coords_to_point(EnwP, 0)+DOWN*0.1,UP).scale(0.8)
             self.play(Write(EnDropText), Write(EwDropText), Write(EnwDropText))
 
-        with self.voiceover(text="If we look at the intervals for coordinates of each line"):
+        with self.voiceover(text="If we look at the intervals for coordinates of each segment"):
             EnBL, EnBR = axes.coords_to_point(EnL, 0), axes.coords_to_point(EnR, 0)
             EwBL, EwBR = axes.coords_to_point(EwL, 0), axes.coords_to_point(EwR, 0)
             EnwBL, EnwBR = axes.coords_to_point(EnwL, 0), axes.coords_to_point(EnwR, 0)
@@ -367,7 +367,7 @@ class Scene(VoiceoverScene):
 
             self.play(FadeOut(int_rel), TransformMatchingTex(int_relDiff, int_relSpan))
 
-        with self.voiceover(text="Let's look at another triplet of flat lines"):
+        with self.voiceover(text="Let's look at another triplet of segments"):
             self.play(FadeOut(LineEn, LineEw, LineEnw, LineEnEx, LineEwEx, LineEnwEx, EwDis, EnwDis, EwDisT, EnwDisT,
                               EnRect, EwRect, EnwRect, EnDropText, EwDropText, EnwDropText))
 
@@ -412,7 +412,7 @@ class Scene(VoiceoverScene):
             EnwDropText2 = MathTex(r"\mathrm{Span}_{n-w}", color=BLUE).scale(0.6).move_to((EnwBL2+EnwBR2) / 2 + DOWN * 0.25+ RIGHT * 0.25)
             self.play(Write(EnDropText2), Write(EwDropText2), Write(EnwDropText2))
 
-        with self.voiceover(text="This time, one of the span is zero, as there is no corresponding flat line for the desired E prime"):
+        with self.voiceover(text="This time, one of the span is zero, as there is no corresponding segment for the desired E prime"):
             self.play(Circumscribe(LineEw2))
 
         with self.voiceover(text="We can work out that this happens when the E prime is a multiple of s or t, whose detail I unfortunately can't cover in this video"):
@@ -422,7 +422,7 @@ class Scene(VoiceoverScene):
                 ).scale(0.8).move_to(RIGHT * 3.5 + DOWN)
             self.play(Write(zero_cond))
 
-        with self.voiceover(text="Lastly, we notice the very first flat line"):
+        with self.voiceover(text="Lastly, we notice the very first segment"):
             self.play(FadeOut(LineEn2, LineEw2, LineEnw2, LineEnEx2, LineEwEx2, LineEnwEx2, EwDis2, EnwDis2, EwDisT2, EnwDisT2,
                               EnRect2, EwRect2, EnwRect2, EnDropText2, EwDropText2, EnwDropText2))
             dEn2 = AlgebraicR2(sqrt_s, sqrt_t, 1, 1)
@@ -572,7 +572,7 @@ class Scene(VoiceoverScene):
 
             pass
 
-        with self.voiceover(text="Let's bring back the triplet of lines from E prime"):
+        with self.voiceover(text="Let's bring back the triplet of segments from E prime"):
             EnL, EnR = 2 * UP + LEFT * 6, 2 * UP + LEFT * 1
             EwL, EwR = LEFT * 5, LEFT * 2
             EnwL, EnwR = 2 * DOWN + LEFT * 4.5, 2 * DOWN + LEFT * 2.5
@@ -709,6 +709,40 @@ class Scene(VoiceoverScene):
         self.play(
             *[FadeOut(mob)for mob in self.mobjects]
         )
+
+    def construct_scene2_5(self):
+        with self.voiceover(text="As I said before, the explanation here is not rigorous"):
+            pass
+
+        with self.voiceover(text="A lot more care needs to be taken when we talk about the derivative of an otherwise discrete function"):
+            der = MathTex(r"\frac{\mathrm{d}E_{s,t}(n)}{\mathrm{d} n}")
+            self.play(Write(der))
+
+        with self.voiceover(text="In this case, it is better to talk about the discrete differential instead"):
+            self.play(der.animate.shift(LEFT * 5))
+            self.play(Create(Cross(der)))
+            disder = MathTex(r"\Delta_n E_{s,t}(n) = E_{s,t}(n + 1) - E_{s,t}(n)")
+            self.play(Write(disder))
+
+        with self.voiceover(text="We also missed another important piece:"):
+            pass
+
+        with self.voiceover(text="E is a convex function, or its second differential is non-negative"):
+            disderc = MathTex(r"\Delta_n^2 E_{s,t}(n) \geq 0").shift(DOWN)
+            self.play(Write(disderc))
+
+        with self.voiceover(text="which needs some extra care to proof as well"):
+            pass
+
+        with self.voiceover(text="This makes it rigorous to link the sign of the differential and the optimal strategy"):
+            disdercc = MathTex(r"\Delta_w D_{s,t}(n, w) \mbox{ changes sign} \Leftrightarrow w \mbox{ is optimal}").shift(DOWN * 2)
+            self.play(Write(disdercc))
+
+        self.wait(3)
+        self.play(
+            *[FadeOut(mob)for mob in self.mobjects]
+        )
+
 
     def construct_scene3(self):
         with self.voiceover(text="Let's recap with a way to compute function E and w"):
@@ -990,10 +1024,54 @@ class Scene(VoiceoverScene):
             *[FadeOut(mob)for mob in self.mobjects]
         )
 
+    def construct_scene4(self):
+        with self.voiceover("It's time to conclude this video"):
+            conclude = Tex("Conclusion").scale(1.5)
+            self.play(Write(conclude))
+
+        with self.voiceover("From the binary search problem with a crashing computer"):
+            pass
+
+        with self.voiceover("We defined function F and w to represent the time cost and optimal strategy"):
+            f_conclude = MathTex("F_{s,t}(n)").shift(DOWN + LEFT * 2)
+            self.play(Write(f_conclude))
+            w_conclude = MathTex("w_{s,t}(n)").shift(DOWN + RIGHT * 2)
+            self.play(Write(w_conclude))
+
+        with self.voiceover("We also defined an auxiliary function E to understand the time cost better"):
+            self.play(Transform(f_conclude, MathTex("E_{s,t}(n)").move_to(f_conclude.get_center())))
+
+        with self.voiceover("We found the pattern behind these functions, and a way to compute them"):
+            pass
+
+        with self.voiceover("There are still a lot to discover"):
+            random1 = MathTex(r"f_{s,t}(x) = \sum_{r}\frac{e^{rx}}{r(se^{tr}+te^{sr})}", color=BLUE).scale(0.8).rotate(PI * 0.1).shift(UP * 2 + LEFT * 4)
+            random2 = MathTex(
+                r"w_{s,t}^{\mathrm{I}} = \bigg[ \bigg\lceil \sqrt{2\bigg(n - \frac{t}{s}\bigg) + \frac{9}{4}} - \frac{3}{2} \bigg\rceil, \bigg\lfloor \sqrt{2\bigg(n - \frac{t}{s}\bigg) - \frac{7}{4}} + \frac{1}{2} \bigg\rfloor \bigg]"
+                , color=BLUE).scale(0.5).rotate(-PI * 0.1).shift(DOWN * 2.5 + RIGHT * 2)
+            random3 = MathTex(r"e^{-sr} + e^{-tr} = 1", color=BLUE).scale(0.8).rotate(PI*0.05).shift(DOWN * 2 + LEFT * 3.5)
+            random4 = MathTex(r"n_{k|k+1}\sim \frac{(t/s)^{k+1}}{(k+1)!}", color=BLUE).scale(0.8).rotate(-PI*0.15).shift(UP * 1.4 + RIGHT * 3.8)
+
+            self.play(Write(random1))
+            self.play(Write(random2))
+            self.play(Write(random3))
+            self.play(Write(random4))
+
+        with self.voiceover("Perhaps I'll make a second video later."):
+            pass
+
+        self.wait(3)
+        #self.play(
+        #    *[FadeOut(mob)for mob in self.mobjects]
+        #)
+
+
     def construct(self):
 
         #self.set_speech_service(AzureService())
         self.set_speech_service(GTTSService())
-        #self.construct_scene1()
-        #self.construct_scene2()
+        self.construct_scene1()
+        self.construct_scene2()
+        self.construct_scene2_5()
         self.construct_scene3()
+        self.construct_scene4()
